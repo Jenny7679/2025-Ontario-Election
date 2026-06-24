@@ -5,17 +5,21 @@ library(dplyr)
 polls <- polls %>%
   arrange(`Last Date of Polling`)
 
-# Publication-ready plot
 ggplot(polls, aes(x = `Last Date of Polling`)) +
-  # Lines for each party
-  geom_smooth(aes(y = PC, color = "PC"), se = FALSE, linewidth = 1) +
-  geom_smooth(aes(y = NDP, color = "NDP"), se = FALSE, linewidth = 1) +
-  geom_smooth(aes(y = Liberal, color = "Liberal"), se = FALSE, linewidth = 1) +
-  geom_smooth(aes(y = Green, color = "Green"), se = FALSE, linewidth = 1) +
+  # Scatter points for each party
+  geom_point(aes(y = PC,      color = "PC"),      alpha = 0.5, size = 1) +
+  geom_point(aes(y = NDP,     color = "NDP"),     alpha = 0.5, size = 1) +
+  geom_point(aes(y = Liberal, color = "Liberal"), alpha = 0.5, size = 1) +
+  geom_point(aes(y = Green,   color = "Green"),   alpha = 0.5, size = 1) +
   
-  # Labels and theme
+  # Smoothed trend lines for each party
+  geom_smooth(aes(y = PC,      color = "PC"),      se = FALSE, linewidth = 1) +
+  geom_smooth(aes(y = NDP,     color = "NDP"),     se = FALSE, linewidth = 1) +
+  geom_smooth(aes(y = Liberal, color = "Liberal"), se = FALSE, linewidth = 1) +
+  geom_smooth(aes(y = Green,   color = "Green"),   se = FALSE, linewidth = 1) +
+  
   labs(
-    title = "Ontario Vote Intention Over the Campaign Period",
+    title    = "Ontario Vote Intention Over the Campaign Period",
     subtitle = "Polling trends by party (2022–2025)",
     x = "Date",
     y = "Vote Intention (%)",
@@ -24,14 +28,14 @@ ggplot(polls, aes(x = `Last Date of Polling`)) +
   ) +
   
   scale_color_manual(values = c(
-    "PC" = "#1f4e79",
-    "NDP" = "#FFA500",
-    "Liberal" = "#e63946",
-    "Green" = "#2a9d8f"
+    "PC"      = "#6baed6",
+    "NDP"     = "#E0A800",
+    "Liberal" = "#8B0000",
+    "Green"   = "#2a9d8f"
   )) +
   
   theme_minimal(base_size = 13) +
   theme(
-    plot.title = element_text(face = "bold"),
+    plot.title    = element_text(face = "bold"),
     legend.position = "bottom"
   )
