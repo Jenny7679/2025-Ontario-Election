@@ -1,8 +1,9 @@
 #Install packages
-devtools::install_github("sjkiss/importProquest", force=T)
+#devtools::install_github("sjkiss/importProquest", force=T)
 library(ImportProquest)
 library(here)
 library(tidyverse)
+
 
 
 files<-list.files(path=here("News/"), recursive=T, pattern="*.txt?")
