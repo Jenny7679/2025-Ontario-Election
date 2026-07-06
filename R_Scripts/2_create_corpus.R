@@ -2,37 +2,65 @@
 library(quanteda)
 library(quanteda.textstats)
 
-# ---- 1. Build corpus ----
-df_corp <- corpus(df, text_field = "text")
-save(df_corp, file = "df_corpus.rdata")
+library(quanteda)
+library(magrittr)
 
-# ---- 2. Tokenize ----
+# ---- Fix spacing artifact (missing space after periods) ----
+df_corp <- gsub("([a-z])\\.([A-Z])", "\\1. \\2", df_corp)
+
 df_tokens <- tokens(df_corp, remove_punct = TRUE) %>%
-  tokens_remove(stopwords("en"))
+  tokens_remove(stopwords("en")) %>%
+  tokens_tolower()
 
-# ---- 3. Filter to Ontario-election stories ----
-# Ontario-provincial signals
-on_signal <- dictionary(list(
-  on = c("crombie", "stiles", "schreiner", "doug ford",
+# ---- Ontario signal, minus bare "ford" (handled separately below) ----
+on_signal_rest <- dictionary(list(
+  on = c("crombie", "stiles", "schreiner",
          "ontario pc*", "ontario liberal*", "ontario ndp", "ontario green*",
          "ontario election", "ontario premier")
 ))
 
-# Federal signals — to spot stories really about Ottawa
+# ---- Context words that must co-occur with bare "ford" for it to count ----
+context_signal <- dictionary(list(
+  ctx = c("doug", "premier", "queen*s park", "ontario")
+))
+
+# ---- Federal signal ----
 fed_signal <- dictionary(list(
   fed = c("carney", "trudeau", "poilievre", "freeland", "gould", "baylis",
           "dhalla", "jagmeet", "singh", "blanchet", "prime minister")
 ))
 
-on_count  <- df_tokens %>% tokens_lookup(on_signal)  %>% dfm() %>% .[, "on"]  %>% as.numeric()
-fed_count <- df_tokens %>% tokens_lookup(fed_signal) %>% dfm() %>% .[, "fed"] %>% as.numeric()
+# Bare "ford" counts
+ford_only <- dictionary(list(ford = "ford"))
+ford_dfm <- df_tokens %>% tokens_lookup(ford_only) %>% dfm()
+ford_count <- ford_dfm[, "ford"] %>% as.numeric()
 
-# Keep: strong Ontario signal AND not dominated by federal mentions
-keep2 <- on_count >= 2 & on_count > fed_count
+# Context word counts (per document)
+context_dfm <- df_tokens %>% tokens_lookup(context_signal) %>% dfm()
+context_count <- context_dfm[, "ctx"] %>% as.numeric()
 
-sum(keep2)                       # how many docs survived
-df_tokens_on <- df_tokens[keep2]
-df_corp_on   <- df_corp[keep2]
+# "ford" only counts toward Ontario signal if a context word is present in the same doc
+ford_valid <- ifelse(context_count > 0, ford_count, 0)
+
+# Rest of Ontario signal (everything except bare "ford")
+on_dfm_rest <- df_tokens %>% tokens_lookup(on_signal_rest) %>% dfm()
+on_count_rest <- on_dfm_rest[, "on"] %>% as.numeric()
+
+# Combined Ontario count = rest of dictionary + validated "ford" mentions
+on_count_combined <- on_count_rest + ford_valid
+
+# Federal count
+fed_dfm <- df_tokens %>% tokens_lookup(fed_signal) %>% dfm()
+fed_count <- fed_dfm[, "fed"] %>% as.numeric()
+
+# Keep: Ontario signal (context-gated) > federal signal
+keep_combined <- on_count_combined > fed_count
+table(keep_combined)
+
+df_tokens_on <- df_tokens[keep_combined]
+df_corp_on   <- df_corp[keep_combined]
+df_corp_fed  <- df_corp[!keep_combined]
+
 
 # ---- 4. Verify the filter ----
 ndoc(df_corp_on)
@@ -40,7 +68,7 @@ head(df_corp_on$titles, 25)      # check stragglers are gone
 
 # ---- 5. Dictionaries ----
 party_dict <- dictionary(list(
-  liberals                  = c("liberals", "liberal"),
+  liberals                  = c("liberals"),
   ontario_liberals          = c("ontario liberals", "ontario liberal"),
   conservatives             = c("conservative", "conservatives"),
   progressive_conservatives = c("progressive conservatives", "PCs", "progressive conservative"),
