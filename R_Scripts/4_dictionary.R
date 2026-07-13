@@ -10,6 +10,9 @@ library(quanteda.textstats)
 library(magrittr)
 library(ggplot2)
 source("R_Scripts/3_editor&duplicates.R")
+
+# this rewrites df_tokens_on based on the deduped corpus
+df_tokens_on <- df_tokens_on[docnames(df_tokens_on) %in% docnames(df_corp)]
 # ---- 1. Topic dictionary ------------------------------------------
 topic_dict <- dictionary(list(
   housing = c("housing", "rent", "rents", "renter*", "landlord*",

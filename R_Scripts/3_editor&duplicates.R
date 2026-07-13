@@ -86,10 +86,10 @@ dup_stage1 <- logical(ndoc(df_corp))
 nt <- norm_title[ord]; dt <- dv$.date[ord]; fm <- dv$.id[ord]
 for (i in 2:length(ord)) {
   same_title  <- !is.na(nt[i]) && !is.na(nt[i-1]) && nt[i] == nt[i-1]
-  same_family <- !is.na(fm[i]) && !is.na(fm[i-1]) && fm[i] == fm[i-1]
+  same_paper <- !is.na(fm[i]) && !is.na(fm[i-1]) && fm[i] == fm[i-1]
   close_date  <- !is.na(dt[i]) && !is.na(dt[i-1]) &&
     abs(as.numeric(dt[i] - dt[i-1])) <= 2
-  if (isTRUE(same_title) && isTRUE(same_family) && close_date)
+  if (isTRUE(same_title) && isTRUE(same_paper) && close_date)
     dup_stage1[ord[i]] <- TRUE
 }
 sum(dup_stage1)   # will be LOWER than v3's 1,637 — cross-paper kept now
@@ -120,14 +120,14 @@ nrow(pairs)
 
 i1 <- match(as.character(pairs$document1), docnames(df_corp))
 i2 <- match(as.character(pairs$document2), docnames(df_corp))
-pairs$same_family <- dv$.id[i1] == dv$.id[i2]
+pairs$same_paper <- dv$.id[i1] == dv$.id[i2]
 
 # How much cross-paper syndication are we keeping? (Simon)
-table(pairs$same_family)
+table(pairs$same_paper)
 
 pair_check <- data.frame(
   sim     = round(pairs$cosine, 3),
-  fam     = pairs$same_family,
+  fam     = pairs$same_paper,
   title1  = substr(dv[[title_var]][i1], 1, 55),
   title2  = substr(dv[[title_var]][i2], 1, 55),
   source1 = substr(dv[[source_var]][i1], 1, 28),
@@ -139,7 +139,7 @@ subset(pair_check, fam) %>% {.[order(.$sim), ]} %>% head(25)
 subset(pair_check, !fam) %>% {.[order(.$sim), ]} %>% head(10)
 
 # ---- F. Commit drops: same-family pairs only ------------------------
-sf_pairs <- pairs[pairs$same_family, ]
+sf_pairs <- pairs[pairs$same_paper, ]
 drop_ids <- character(0)
 for (k in seq_len(nrow(sf_pairs))) {
   a <- as.character(sf_pairs$document1[k])
