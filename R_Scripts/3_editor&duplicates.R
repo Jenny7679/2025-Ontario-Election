@@ -16,7 +16,7 @@ library(here)
 source(here("R_Scripts/2_create_corpus.R"))
 #Count documents
 ndoc(df_corp)   # 16508
-
+table(docvars(df_corp)$origin)
 section_var <- "section"
 source_var  <- "origin"
 date_var    <- "dates"
@@ -49,7 +49,7 @@ ndoc(df_corp)
 # Maps print + online editions of a paper to one label. Different
 # papers in the same CHAIN (Toronto Sun vs Ottawa Sun) stay distinct
 # on purpose — cross-paper syndication is the team's call.
-paper_family <- function(x) {
+paper_id <- function(x) {
   x <- gsub("\\s", "", tolower(x))    # kill corrupted spaces FIRST
   dplyr::case_when(
     grepl("globeandmail",      x) ~ "globe",
@@ -73,17 +73,17 @@ paper_family <- function(x) {
 dv <- docvars(df_corp)
 dv$.date      <- as.Date(dv[[date_var]])
 dv$.is_online <- grepl("online", dv[[source_var]], ignore.case = TRUE)
-dv$.family    <- paper_family(dv[[source_var]])
-sort(table(dv$.family), decreasing = TRUE)   # check the mapping
+dv$.id    <- paper_id(dv[[source_var]])
+sort(table(dv$.id), decreasing = TRUE)   # check the mapping
 
 # ---- D. Stage 1: same title, <=2 days, SAME family ------------------
 norm_title <- tolower(dv[[title_var]])
 norm_title <- gsub("[[:punct:]]", "", norm_title)
 norm_title <- gsub("\\s+", " ", trimws(norm_title))
 
-ord <- order(norm_title, dv$.family, dv$.is_online, dv$.date)
+ord <- order(norm_title, dv$.id, dv$.is_online, dv$.date)
 dup_stage1 <- logical(ndoc(df_corp))
-nt <- norm_title[ord]; dt <- dv$.date[ord]; fm <- dv$.family[ord]
+nt <- norm_title[ord]; dt <- dv$.date[ord]; fm <- dv$.id[ord]
 for (i in 2:length(ord)) {
   same_title  <- !is.na(nt[i]) && !is.na(nt[i-1]) && nt[i] == nt[i-1]
   same_family <- !is.na(fm[i]) && !is.na(fm[i-1]) && fm[i] == fm[i-1]
@@ -120,7 +120,7 @@ nrow(pairs)
 
 i1 <- match(as.character(pairs$document1), docnames(df_corp))
 i2 <- match(as.character(pairs$document2), docnames(df_corp))
-pairs$same_family <- dv$.family[i1] == dv$.family[i2]
+pairs$same_family <- dv$.id[i1] == dv$.id[i2]
 
 # How much cross-paper syndication are we keeping? (Simon)
 table(pairs$same_family)
@@ -152,6 +152,6 @@ length(drop_ids)
 
 df_corp <- df_corp[!docnames(df_corp) %in% drop_ids]
 ndoc(df_corp)
-
+pair_check %>% view()
 # Save the syndication evidence for the team discussion:
 # write.csv(subset(pair_check, !fam), "syndicated_pairs_kept.csv", row.names = FALSE)
