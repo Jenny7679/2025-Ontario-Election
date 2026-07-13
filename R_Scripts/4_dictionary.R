@@ -76,9 +76,8 @@ kwic(df_tokens_on, phrase("free trade"), window = 6) %>% head(10)
 kwic(df_tokens_on, "college", window = 6) %>% head(10)
 
 # ---- 4. Topic mentions by week (scaffold for the trend graph) -----
-# Uncomment once date docvar name is confirmed.
 docvars(df_tokens_on, "week") <-
-  as.Date(cut(as.Date(docvars(df_tokens_on, "date")), "week"))
+  as.Date(cut(as.Date(docvars(df_tokens_on, "dates")), "week"))
 
 topic_week <- df_tokens_on %>%
   tokens_lookup(topic_dict) %>%
@@ -86,6 +85,7 @@ topic_week <- df_tokens_on %>%
   dfm_group(groups = docvars(df_tokens_on, "week")) %>%
   convert(to = "data.frame")
 
+topic_week
 topic_long <- tidyr::pivot_longer(topic_week, -doc_id,
                                    names_to = "topic",
                                    values_to = "mentions")
