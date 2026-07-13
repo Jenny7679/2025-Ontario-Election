@@ -4,6 +4,8 @@ library(quanteda.textstats)
 
 library(quanteda)
 library(magrittr)
+#Create corpus
+df_corp<-corpus(df, text_field="text")
 
 # ---- Fix spacing artifact (missing space after periods) ----
 df_corp <- gsub("([a-z])\\.([A-Z])", "\\1. \\2", df_corp)
