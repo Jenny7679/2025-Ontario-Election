@@ -11,7 +11,7 @@
 library(quanteda)
 library(quanteda.textstats)
 library(magrittr)
-
+library(here)
 # 1. Rebuild df from the raw ProQuest files
 source(here("R_Scripts/2_create_corpus.R"))
 #Count documents
