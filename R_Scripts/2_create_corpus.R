@@ -4,6 +4,10 @@ library(quanteda.textstats)
 
 library(quanteda)
 library(magrittr)
+
+# Source the read news scripts
+library(here)
+source(here("R_Scripts/1_read_in_news.R"))
 #Create corpus
 df_corp<-corpus(df, text_field="text")
 
