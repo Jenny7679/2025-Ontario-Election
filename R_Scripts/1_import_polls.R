@@ -49,7 +49,7 @@ polls[, 3:6] <- lapply(polls[, 3:6], parse_number)
 polls$`Last Date of Polling` <- mdy(polls$`Last Date of Polling`)
 
 # Export to Excel
-write_xlsx(polls, "ontario_polls.xlsx")
+write_xlsx(polls, "vote_intention.xlsx")
 
 # View result
 glimpse(polls)
