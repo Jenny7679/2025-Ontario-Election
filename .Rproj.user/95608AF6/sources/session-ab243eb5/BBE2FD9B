@@ -1,0 +1,26 @@
+{
+    "id": "BBE2FD9B",
+    "path": "~/Library/CloudStorage/OneDrive-WilfridLaurierUniversity/ontarioelection2025v2/R_Scripts/1_import_polls.R",
+    "project_path": "R_Scripts/1_import_polls.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1784149784894.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "50,13",
+        "scrollLine": "36"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1784153315,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1784153315921,
+    "read_only": false,
+    "read_only_alternatives": []
+}
