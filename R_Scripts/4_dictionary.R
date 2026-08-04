@@ -9,6 +9,7 @@ library(quanteda)
 library(quanteda.textstats)
 library(magrittr)
 library(ggplot2)
+library(keyATM)
 source("R_Scripts/3_editor&duplicates.R")
 
 # this rewrites df_tokens_on based on the deduped corpus
@@ -64,6 +65,7 @@ topic_dfm <- df_tokens_on %>%
   tokens_lookup(topic_dict) %>%
   dfm()
 
+
 # Total mentions per topic across the corpus
 sort(colSums(topic_dfm), decreasing = TRUE)
 
@@ -102,3 +104,4 @@ topic_long <- tidyr::pivot_longer(topic_week, -doc_id,
  
 # The leader-mentions-by-week graph is the same recipe: swap
 # topic_dict for leader_dictionaries.
+ 
