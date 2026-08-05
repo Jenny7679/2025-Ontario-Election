@@ -105,11 +105,14 @@ p <- ggplot(polls, aes(x = date, y = net, colour = leader)) +
   coord_cartesian(clip = "off") +
   labs(
     title    = "Net Impressions of Ontario Party Leaders, 2024\u20132025",
-    x = NULL, y = "Net impression (points)",
+    caption  = "Source: Abacus Data",
+    x = NULL, y = "Net impression (points)"
   ) +
   theme_minimal(base_size = 12) +
   theme(
     plot.title.position = "plot",
+    plot.caption.position = "plot",
+    plot.caption = element_text(hjust = 0, colour = "grey30", size = 9),
     axis.text.x = element_text(angle = 45, hjust = 1),
     panel.grid.minor = element_blank()
   )
